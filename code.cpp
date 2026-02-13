@@ -1,7 +1,3 @@
-// imu_live.cpp
-// Build: g++ -O2 -std=c++17 imu_live.cpp -o imu_live
-// Run:   sudo ./imu_live
-
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -55,7 +51,6 @@ static void write8(int fd, uint8_t addr, uint8_t reg, uint8_t val) {
 }
 
 static int16_t read16_le(int fd, uint8_t addr, uint8_t reg_l) {
-    // Read little-endian 16-bit as (low byte at reg_l, high byte at reg_l+1)
     uint8_t lo = read8(fd, addr, reg_l);
     uint8_t hi = read8(fd, addr, uint8_t(reg_l + 1));
     return int16_t(uint16_t(lo) | (uint16_t(hi) << 8));
@@ -64,20 +59,19 @@ static int16_t read16_le(int fd, uint8_t addr, uint8_t reg_l) {
 int main() {
     constexpr const char* I2C_DEV = "/dev/i2c-1";
 
-    // I2C addresses from your assignment:
     constexpr uint8_t ADDR_LSM6 = 0x6B; // gyro+accel
     constexpr uint8_t ADDR_LIS3 = 0x1E; // magnetometer
 
-    // --- LSM6DS33 registers (from datasheet register map) ---
+    // LSM6DS33 registers 
     constexpr uint8_t REG_WHO_AM_I_LSM6 = 0x0F;
     constexpr uint8_t REG_CTRL1_XL      = 0x10;
     constexpr uint8_t REG_CTRL2_G       = 0x11;
 
-    // Output regs from register map:
+    // Output regs
     constexpr uint8_t REG_OUTX_L_G  = 0x22;
     constexpr uint8_t REG_OUTX_L_XL = 0x28;
 
-    // --- LIS3MDL registers (from datasheet register map) ---
+    // LIS3MDL registers 
     constexpr uint8_t REG_WHO_AM_I_LIS3 = 0x0F;
     constexpr uint8_t REG_CTRL_REG1     = 0x20;
     constexpr uint8_t REG_CTRL_REG2     = 0x21;
@@ -87,7 +81,7 @@ int main() {
 
     int fd = i2c_open(I2C_DEV);
 
-    // 1) Identify devices (WHO_AM_I)
+    // WHO_AM_I regs
     uint8_t who_lsm6 = read8(fd, ADDR_LSM6, REG_WHO_AM_I_LSM6);
     uint8_t who_lis3 = read8(fd, ADDR_LIS3, REG_WHO_AM_I_LIS3);
 
@@ -124,7 +118,6 @@ int main() {
     std::cout << "Configured sensors. Streaming raw data...\n";
     std::cout << "Press Ctrl+C to stop.\n\n";
 
-    // Header
     std::cout << std::dec
               << "  Gx     Gy     Gz  |  Ax     Ay     Az  |  Mx     My     Mz\n"
               << "-----------------------------------------------------------------\n";
